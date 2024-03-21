@@ -1,0 +1,41 @@
+
+
+body {
+    transition: background-image ease-in-out 1.7s;
+    /* course.css is in "static/css", so it needs to come back one level and access "img" */
+    background-image: url("../img/horizons/dawn.jpg");
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    font-family: consolas;
+    color: white;
+    min-height: 90vh;
+    margin: 1rem;
+}
+
+.flex-typeA {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button {
+    background-image: linear-gradient(to bottom left, crimson, red, yellow);
+    color: black;
+    padding: .5rem;
+    letter-spacing: .2rem;
+    box-shadow: 0 0 1rem crimson;
+    border: transparent;
+    font-size: 1rem;
+    margin: .4rem;
+    cursor: pointer;
+}
+
+.winner-btn {
+    border: white solid 1px;
+    padding: .5rem;
+    border-radius: .2rem;
+    box-shadow: 0 0 1rem white;
+    background-image: linear-gradient(to bottom left, red, green, blue);
+}

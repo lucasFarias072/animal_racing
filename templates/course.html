@@ -1,0 +1,325 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extensão</title>
+    <style>
+        body {
+            transition: background-image ease-in-out 1.7s;
+            background-image: url("img/dawn.jpg");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: consolas;
+            color: white;
+            min-height: 90vh;
+            margin: 1rem;
+        }
+
+        .flex-typeA {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button {
+            background-image: linear-gradient(to bottom left, crimson, red, yellow);
+            color: black;
+            padding: .5rem;
+            letter-spacing: .2rem;
+            box-shadow: 0 0 1rem crimson;
+            border: transparent;
+            font-size: 1rem;
+            margin: .4rem;
+            cursor: pointer;
+        }
+
+        .winner-btn {
+            border: white solid 1px;
+            padding: .5rem;
+            border-radius: .2rem;
+            box-shadow: 0 0 1rem white;
+            background-image: linear-gradient(to bottom left, red, green, blue);
+        }
+    </style>
+</head>
+<body>
+    <main>
+        
+        <section>
+            <div class="flex-typeA">
+                <button id="btn-start" class="n">Iniciar</button>
+                <h3 class="winner-btn">Vencedor: <span id="winner">?</span></h3>
+            </div>
+            
+            <div class="pets"></div>
+        </section>
+    </main>
+    <script>
+        const petsProperties = [
+            {id: "bird", src: "img/holiday_cardinal .gif", alt: "animal cardinal bird"},
+            {id: "cat", src: "img/waffles_the_cat.gif", alt: "animal cat"},
+            {id: "coyote", src: "img/the_coyote_brothers.gif", alt: "animal coyote"},
+            {id: "dog", src: "img/brandy.gif", alt: "animal dog"},
+            {id: "monkey", src: "img/nihonzaru.gif", alt: "animal monkey"},
+            {id: "sheep", src: "img/ramune.gif", alt: "animal sheep"},
+            {id: "turkey", src: "img/dumplin_McGibblet.gif", alt: "animal turkey"},
+            {id: "wolf", src: "img/lobo_the_gray_wolf.gif", alt: "animal wolf"},
+            {id: "wombat", src: "img/sisky_the_wombat.gif", alt: "animal wombat"}
+        ]
+
+        const petsTemp = document.querySelector(".pets")
+        createPets(petsTemp, 9)
+        const pets = document.querySelectorAll(".pet")
+        setPetsPosition(pets, petsProperties)
+        setPetsSpecificProperties(pets, "", "25px", "40px")
+        
+        // The ones that recieve "none" on "display" property will have their offset canceled at "match" function
+        setWhichPetWillRun(pets)
+        
+        // Array that hold the current offset value of each runner (all 0 at first) based on how many runners there are
+        const petsOffset = newArray(pets.length)
+        
+        // If this element is clicked (its className changes to "y"), the match starts (listener at "matchStartTrigger")
+        let run = document.getElementById("btn-start")
+
+        // Element that changes its text to the winner name
+        let winner = document.getElementById("winner")
+
+        // 
+        let firstPlace
+
+        function warmUpPets(petElements, petsOffset, runElement) {
+            let loopBeforeMatch = setInterval(() => {
+                petElements.forEach((pet, pos) => {
+                    pet.style.transform = `translateX(${petsOffset[pos]}px) rotate(${getValue(-5, 6)}deg)`
+                })
+                if (runElement.className == "y") {
+                    clearInterval(loopBeforeMatch)
+                }
+            }, 500)
+        }
+
+        function createPets(containerElement, amount) {
+            for (let i = 0; i < amount; i++) {
+                // Div shelters img and both are placed within the existing div that will shelter them all
+                const imgWrapperTag = document.createElement("div")
+                const imgTag = document.createElement("img")
+                imgTag.setAttribute("class", "pet")
+                imgTag.setAttribute("id", "")
+                imgTag.setAttribute("src", "")
+                imgTag.setAttribute("alt", "")
+                imgWrapperTag.appendChild(imgTag)
+                containerElement.appendChild(imgWrapperTag) 
+            }
+        }
+        
+        function shuffle(petElements) {
+            for (let i = 0; i < petElements.length; i++) {
+                let randomIndex = getValue(0, petElements.length - 1)
+                let current = petElements[i]
+                petElements[i] = petElements[randomIndex]
+                petElements[randomIndex] = current
+            }
+        }
+        
+        function setPetsPosition(petElements, petImages) {
+            shuffle(petImages)
+            petElements.forEach((pet, pos) => {
+                pet.setAttribute("id", petImages[pos].id)
+                pet.setAttribute("src", petImages[pos].src)
+                pet.setAttribute("alt", petImages[pos].alt)
+            })
+        }
+
+        function getValue(min, max) {
+            return Math.floor(Math.random() * (max - min) + min)
+        }
+
+        function getColor() {
+            return `rgb(${getValue(0, 256)},${getValue(0, 256)},${getValue(0, 256)})`
+        }
+
+        function setPetsSpecificProperties(arrayPets, petName, petHeight, petWidth) {
+            arrayPets.forEach(pet => {
+                pet.className = petName
+                pet.style.margin = ".4rem"
+                pet.style.height = petHeight
+                pet.style.width = petWidth
+            })
+        }
+        
+        function setWhichPetWillRun(arrayPets) {
+            arrayPets.forEach(pet => {
+                pet.addEventListener("click", () => {
+                    if (pet.style.display == "") {
+                        pet.style.display = "none"
+                    } 
+                })
+            })
+        }
+
+        function newArray(size) {
+            const array = []
+            for (let i = 0; i < size; i++) {
+                array.push(0)
+            }
+            return array
+        }
+        
+        // Watches "run" variable value (changes its className to "y") (if course is over, its className changes to "n")
+        function matchStartTrigger() {
+            run.addEventListener("click", () => {
+                if (run.className == "n") {
+                    run.className = "y"
+                    run.textContent = "resetar"
+                    match()
+                } 
+                else if (run.className == "y") {
+                    run.className = "n"
+                    // Restart with hard reset
+                    location.reload()
+                }
+            })
+        }
+        
+        // Used at "match" function (inside a loop) so the first place changes constantly
+        function trackFirstPlace(petsOffsets, petsElements, passHighestOffsetValue=false) {
+            /*
+            petsOffsets        = array of numbers
+            petsElements       = array of HTML elements
+            petsOffsets.length = petsElements.length (because each offset references one pet)
+            
+            highestValue
+                gets highest value from the array of numbers (which increases constantly) ("match" function does it)
+
+            highestValueIndex
+                gets the correct index of the offset that is the greatest one
+                this means, this index is the correct reference pointing to the HTML element as well
+                if, for instance, this value is 2, then the HTML on position 2 is the current leading pet on the course
+                
+            firstPlace
+                get the correct HTML element of the animal and gets its id attribute value
+                this way, you have the name of the current winner of the course
+
+            passHighestOffsetValue
+                works as an adapting tool for the "switchDayTimeAccordinTo" function
+                "switchDayTimeAccordinTo" changes the game scenario based on the value of the offset of the leading pet
+                so if the leading pet reaches a certain value (passed by this variable), the scenario changes its background
+            */
+     
+            highestValue = petsOffsets.reduce((left, right) => (right > left ? right : left), petsOffsets[0])
+            highestValueIndex = petsOffsets.indexOf(highestValue)
+            firstPlace = petsElements[highestValueIndex].attributes.id.textContent
+            
+            if (passHighestOffsetValue) {
+                return highestValue
+            }
+
+            return firstPlace
+        }
+        
+        function highlightFirstPlace(petElements, petIndex) {
+            petElements[petIndex].style.borderBottom = `solid .3rem ${getColor()}`
+            petElements[petIndex].style.padding = `.2rem`
+            document.body.style.padding = `.2rem`
+        }
+
+        function cancelHighlight(petElements, petIndex) {
+            petElements[petIndex].style.borderBottom = "inherit"
+            petElements[petIndex].style.padding = "inherit"
+        }
+
+        function switchDayTimeAccordinTo(petX) {
+            if (petX >= 150 && petX < 500) {
+                document.body.style.transition = 'background-image ease-in-out 1.7s'
+                document.body.style.backgroundImage = 'url("img/morning.jpg")'
+            }
+
+            if (petX >= 500 && petX < 800) {
+                document.body.style.transition = 'background-image ease-in-out 1.7s'
+                document.body.style.backgroundImage = 'url("img/afternoon.jpg")'
+            }
+
+            if (petX >= 800 && petX < 950) {
+                document.body.style.transition = 'background-image ease-in-out 1.7s'
+                document.body.style.backgroundImage = 'url("img/dusk.jpg")'
+            }
+
+            if (petX >= 950) {
+                document.body.style.transition = 'background-image ease-in-out 1.7s'
+                document.body.style.backgroundImage = 'url("img/night.jpg")'
+            }
+                    
+        }
+        
+        // Stops the match when leading pet "x" position is bigger than the breaking point 
+        function isMatchFinished(petX, breakingPoint) {
+            return petX > breakingPoint
+        }
+        
+        function isPetNotBlocked(petIndex, petElements) {
+            return petElements[petIndex].style.display != "none"
+        }
+
+        function moveEachPet(currentOffset, petIndex, arrayOffsets, arrayPets) {
+            arrayOffsets[petIndex] += getValue(1, 11)
+            arrayPets[petIndex].style.transform = `translateX(${currentOffset}px) rotate(${getValue(-5, 6)}deg)`
+        }
+
+        function resetMatch(winnerElement, runElement, loop) {
+            winnerElement.textContent = firstPlace
+            runElement.textContent = "Reiniciar"
+            clearInterval(loop)
+        }
+
+        function identifyLeadingPet(firstPlaceName, petsElements) {
+            petsElements.forEach((pet, pos) => {
+                if (firstPlaceName === pet.attributes.id.textContent) {
+                    highlightFirstPlace(pets, pos)
+                }
+                else {
+                    cancelHighlight(pets, pos)
+                }
+            })
+        }
+
+        function match() {
+            
+            let loop = setInterval(() => {
+
+                petsOffset.forEach((petX, petIndex) => {
+                    
+                    if (isMatchFinished(petX, 1250)) {
+                        resetMatch(winner, run, loop)
+                    }
+                
+                    // How pets run (if they were not clicked to be hidden)
+                    if (isPetNotBlocked(petIndex, pets)) {
+                        moveEachPet(petX, petIndex, petsOffset, pets)
+                    }
+                    
+                    firstPlace = trackFirstPlace(petsOffset, pets)
+                    firstPlacePos = trackFirstPlace(petsOffset, pets, true)
+                    
+                    switchDayTimeAccordinTo(firstPlacePos)
+
+                    identifyLeadingPet(firstPlace, pets)
+                })
+            }, 100)
+        }
+        
+        warmUpPets(pets, petsOffset, run)
+        matchStartTrigger()
+
+        if (run.className == "y") {
+            match()
+        }
+        
+    </script>
+</body>
+</html>
